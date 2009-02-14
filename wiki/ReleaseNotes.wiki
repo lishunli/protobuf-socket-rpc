@@ -1,6 +1,18 @@
 #summary Release Notes
 
+= Release Notes =
+
 == Version 1.2 (SVN Revision 12) ==
 
   * Errors that occur on server side are not relayed back to client. Client has new error reasons for them in the controller.
+  * Client callback behavior is faithful replication of server callback scenrios:
+    * Callback is called with good response.
+    * Callback is not called.
+    * Callback is called with null.
+    * Callback is called with empty protocol buffer.
   * Added comprehensive unit tests for client and server.
+
+== Version 1.1 (SVN Revision 9) ==
+
+  * Added error handling. When errors occur, the client can find out what error occurred from the controller.
+  * Started adding unit tests.
