@@ -1,6 +1,0 @@
-#summary Release Notes
-
-== Version 1.2 (SVN Revision 12) ==
-
-  * Errors that occur on server side are not relayed back to client. Client has new error reasons for them in the controller.
-  * Added comprehensive unit tests for client and server.
