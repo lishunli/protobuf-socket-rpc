@@ -5,7 +5,7 @@
 == Version 1.2 (SVN Revision 12) ==
 
   * Errors that occur on server side are not relayed back to client. Client has new error reasons for them in the controller.
-  * Client callback behavior is faithful replication of server callback scenrios:
+  * Client callback behavior is faithful replication of server callback scenarios:
     * Callback is called with good response.
     * Callback is not called.
     * Callback is called with null.
