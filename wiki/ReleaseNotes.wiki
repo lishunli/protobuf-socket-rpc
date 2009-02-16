@@ -1,4 +1,6 @@
-#summary Release Notes
+#summary Release Notes for releases of this project.
+
+<wiki:toc max_depth="2" />
 
 = Release Notes =
 
