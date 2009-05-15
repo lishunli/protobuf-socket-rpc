@@ -6,8 +6,7 @@
 
 == Trunk HEAD ==
 
-  * Moving error reasons out of response message into its own top level type in the
-proto. Added client side error reasons to the error codes to be consistent.
+  * Moving error reasons out of response message into its own top level type in the proto. Added client side error reasons to the error codes to be consistent.
 
 == Version 1.2 (SVN Revision 12) ==
 
