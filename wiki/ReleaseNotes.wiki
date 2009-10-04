@@ -6,6 +6,9 @@
 
 == Trunk HEAD ==
 
+== Version 1.3 (SVN Revision 33) ==
+
+  * Protobuf 2.2.0 compatible and dependent.
   * Moving error reasons out of response message into its own top level type in the proto. Added client side error reasons to the error codes to be consistent.
 
 == Version 1.2 (SVN Revision 12) ==
