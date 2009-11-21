@@ -28,6 +28,7 @@ requires a server to be running first (i.e. run_server.py).
 
 Authors: Martin Norbury (mnorbury@lcogt.net)
          Eric Saunders (esaunders@lcogt.net)
+         Zach Walker (zwalker@lcogt.net)
 May 2009
 '''
 
@@ -36,7 +37,7 @@ import sys
 sys.path.append('../../main')
 
 import time_pb2 as proto
-import protobuf.channel as ch
+from protobuf import Service
 
 import logging
 log = logging.getLogger(__name__)
@@ -58,18 +59,9 @@ if __name__=='__main__':
     # Create request message
     request = proto.TimeRequest()
     
-    # Create channel
-    channel = ch.SocketRpcChannel(hostname, port)
-    controller = channel.newController()
-    
-    # Create the service
-    callback = Callback()
-    service = proto.TimeService_Stub(channel)
-    service.getTime(controller,request,callback)
-
-    if controller.failed():
-        log.info('Success = %s' % controller.success)
-        log.info('Error = %s' % controller.error)
-        log.info('Reason = %s' % controller.reason)
-    else:
-        log.info(callback.time)
+    service = Service(proto.TimeService_Stub, port, hostname)
+    try:
+        response = service.getTime(request, timeout=1000)
+        log.info(response)
+    except Exception, ex:
+        log.exception(ex)
