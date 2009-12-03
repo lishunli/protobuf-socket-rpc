@@ -51,18 +51,23 @@ port     = 8090
 request = hello_world_pb2.HelloRequest()
 request.my_name = 'Zach'
 
-service = protobuf.Service(hello_world_pb2.HelloWorldService_Stub,
+# Create a new service instance
+service = protobuf.RpcService(hello_world_pb2.HelloWorldService_Stub,
                             port,
                             hostname)
 
+# Define a simple async callback
 def callback(request, response):
     log.info('Asynchronous response :' + response.__str__())
+    
+# Make an asynchronous call
 try:
     log.info('Making asynchronous call')
     response = service.HelloWorld(request, callback=callback)
 except Exception, ex:
     log.exception(ex)
 
+# Make a synchronous call
 try:
     log.info('Making synchronous call')
     response = service.HelloWorld(request, timeout=10000)

@@ -37,7 +37,7 @@ import sys
 sys.path.append('../../main')
 
 import time_pb2 as proto
-from protobuf import Service
+import protobuf
 
 import logging
 log = logging.getLogger(__name__)
@@ -45,21 +45,15 @@ hostname = 'localhost'
 port = 8090
 
 
-class Callback:
-    def run(self,response):
-        log.debug('Callback')
-        self.time = response.str_time
-
 if __name__=='__main__':
 
     logging.basicConfig(level=logging.DEBUG)
-    
     log.debug("test")
     
     # Create request message
     request = proto.TimeRequest()
     
-    service = Service(proto.TimeService_Stub, port, hostname)
+    service = protobuf.RpcService(proto.TimeService_Stub, port, hostname)
     try:
         response = service.getTime(request, timeout=1000)
         log.info(response)

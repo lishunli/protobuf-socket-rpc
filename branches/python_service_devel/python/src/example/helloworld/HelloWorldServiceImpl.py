@@ -23,6 +23,7 @@
 
 Authors: Eric Saunders (esaunders@lcogt.net)
          Martin Norbury (mnorbury@lcogt.net)
+         Zach Walker (zwalker@lcogt.net)
 
 May 2009
 '''
@@ -43,8 +44,10 @@ class HelloWorldImpl(hello_world_pb2.HelloWorldService):
         # Create a reply
         response = hello_world_pb2.HelloResponse()
         response.hello_world = 'Hello %s' % name
-        #Sleeping to show asynchronous behavior on client end.
+        
+        # Sleeping to show asynchronous behavior on client end.
         time.sleep(1)
+        
         # We're done, call the run method of the done callback
         done.run(response)
 

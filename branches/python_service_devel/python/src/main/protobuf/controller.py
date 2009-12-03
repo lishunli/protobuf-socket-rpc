@@ -49,7 +49,6 @@ class SocketRpcController(service.RpcController):
 
     def __init__(self):
         '''Constructor which initializes the controller's state.'''
-        self.success = False
         self.fail = False
         self.error   = None
         self.reason  = None
@@ -64,7 +63,6 @@ class SocketRpcController(service.RpcController):
 
     def reset(self):
         '''Resets the controller i.e. clears the error state.'''
-        self.success = False
         self.fail = False
         self.error   = None
         self.reason  = None
