@@ -58,13 +58,18 @@ class RpcThread(threading.Thread):
         self.setDaemon(True)
     
     def run(self):
-        # Make the RPC call and pass in a generic object with a
-        # function called "run" linked to callback
-        # Attempting to do something similar to a JAVA anonymous class
-        # Create an instance of a new generic type initialized with a
-        # dict that has a run method pointing to the callback function
-        self.method(self.service, self.controller, self.request,
-                    type("", (), {"run": self.callback})())
+        # Make the RPC call and pass in a object with a
+        # function called "run"
+        if callable(self.callback):
+            # Attempting to do something similar to a JAVA anonymous class
+            # Create an instance of a new generic type initialized with a
+            # dict that has a run method pointing to the callback function
+            self.method(self.service, self.controller, self.request,
+                        type("", (), {"run": lambda *args : self.callback(self.request, args[1])})())
+        else:
+            #Assuming callback has a run method
+            self.method(self.service, self.controller, self.request,
+                        self.callback)
         
         
 class RpcService(object):
@@ -95,7 +100,7 @@ class RpcService(object):
         # go through service_stub methods and add a wrapper function to 
         # this object that will call the method
         for method in service_stub_class.GetDescriptor().methods:
-            #Add service methods to the this object
+            # Add service methods to the this object
             rpc = lambda request, timeout=None, callback=None, service=self, method=method.name : service.call(
                         service_stub_class.__dict__[method], request, timeout, callback)
             rpc.__doc__ = method.name + ' method of the ' + \
@@ -124,7 +129,11 @@ class RpcService(object):
     
     def call(self, rpc, request, timeout=None, callback=None):
         ''' Save the object that has been created and return the response.
-            Will timeout after timeout ms if response has not been received
+            Will timeout after timeout ms if response has not been received.
+            The timeout arg is only used for asynch requests.
+            If a callback has been supplied the timeout arg is not used.
+            The response value will be returned for a synch request but nothing
+            will be returned for an asynch request.
             
             Accepted Arguments:
             timeout -- (Integer) ms to wait for a response before returning
@@ -143,6 +152,11 @@ class RpcService(object):
         if callback == None:
             rpc_callback = synch_callback
         else:
+            if ((not callable(callback) and 
+                 (callback.__class__.__dict__.get('run') == None or
+                  callback.run.func_code.co_argcount < 2)) or
+                   (callable(callback) and callback.func_code.co_argcount < 2)):
+                raise Exception("callback must be a callable with signature callback(request, response, ...) or an object with a callable run function with the same signature")                    
             rpc_callback = callback
         
         # Create a controller for this call

@@ -53,8 +53,8 @@ request.my_name = 'Zach'
 
 # Create a new service instance
 service = protobuf.RpcService(hello_world_pb2.HelloWorldService_Stub,
-                            port,
-                            hostname)
+                              port,
+                              hostname)
 
 # Define a simple async callback
 def callback(request, response):

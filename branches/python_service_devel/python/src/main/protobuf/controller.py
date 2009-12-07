@@ -37,8 +37,6 @@ import google.protobuf.service as service
 # Module imports
 from protobuf import logger
 
-log = logger.getLogger(__name__)
-
 
 
 class SocketRpcController(service.RpcController):

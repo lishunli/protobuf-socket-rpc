@@ -30,6 +30,7 @@ Nov 2009
 import unittest
 import sys
 import threading
+from time import sleep
 
 # Add protobuf module to path
 sys.path.append('../../main')
@@ -58,14 +59,17 @@ class ServerThread(threading.Thread):
     
     def __init__(self):
         threading.Thread.__init__(self)
-        self.test_service        = fake.TestServiceImpl()
-        self.server              = server.SocketRpcServer(port)
+        self.test_service  = fake.TestServiceImpl()
+        self.server        = server.SocketRpcServer(port)
         self.server.registerService(self.test_service)
         self.setDaemon(True)
     
     @staticmethod    
     def start_server():
-        '''Start the singleton instance if not already running'''
+        '''Start the singleton instance if not already running
+           Will not exit until the process ends 
+        '''
+        
         if ServerThread.instance == None:
             ServerThread.instance = ServerThread()
             ServerThread.instance.start()
@@ -74,18 +78,52 @@ class ServerThread(threading.Thread):
         self.server.run()
 
 
+class Callback(object):
+    '''A simple call back object for testing RpcService callbacks'''
+
+    def __init__(self):
+        self.called = False
+        self.response = None
+        self.condition = threading.Condition(threading.Lock())
+        
+        
+    def run(self, response):
+        self.condition.acquire()
+        self.called = True
+        self.response = response
+        self.condition.notify()
+        self.condition.release()
+        
+        
 
 class TestRpcService(unittest.TestCase):
     '''Unit tests for the protobuf.service.RpcService class.'''
     
+    # For testing asynch callback as a method
+    callback_method_called = False
+    callback_method_request = None
+    callback_method_response = None
+    callback_method_condition = threading.Condition()
+    
+    # Asynch callback method for testing
+    @staticmethod
+    def callback(request, response):
+        TestRpcService.callback_method_condition.acquire()
+        TestRpcService.callback_method_called = True
+        TestRpcService.callback_method_request = request
+        TestRpcService.callback_method_response = response
+        TestRpcService.callback_method_condition.notify()
+        TestRpcService.callback_method_condition.release()
+    
     def setUp(self):
         self.service = service.RpcService(test_pb2.TestService_Stub,
-                                           port,
-                                           host)
+                                          port,
+                                          host)
         self.request = test_pb2.Request()
         self.request.str_data = 'I like cheese'
         self.callback = lambda request, response : response
         
+        #Start a server thread
         ServerThread.start_server()
         
     def tearDown(self):
@@ -108,12 +146,45 @@ class TestRpcService(unittest.TestCase):
             self.assertNotEqual(self.service.__dict__.get(method.name), None,
                                 "method %s not found in service" % method.name)
     
-    def test_call_asynch(self):
-        '''Test an asynchronous call'''
+    def test_call_asynch_callback_object(self):
+        '''Test an asynchronous callback object'''
+        callback = Callback()
+        callback.condition.acquire()
         try:
-            self.service.TestMethod(self.request, callback=self.callback)
+            self.service.TestMethod(self.request, callback=callback)
         except Exception, e:
+            traceback.print_exc()
             self.assert_(False, 'Caught an unexpected exception %s' % e)
+            
+        
+        callback.condition.wait(2.0)
+        self.assertEquals(True, callback.called,
+                          'Asynch callback was not called')
+        
+        # Cannot compare reposne to None because of bug in protobuf msg compare code
+        self.assert_(type(callback.response) != None.__class__,
+                            'Callback response was None')  
+    
+    
+    def test_call_asynch_callback_method(self):
+        '''Test an asynchronous callback method'''
+        TestRpcService.callback_method_condition.acquire()
+        try:
+            self.service.TestMethod(self.request, callback=TestRpcService.callback)
+        except Exception, e:
+            traceback.print_exc()
+            self.assert_(False, 'Caught an unexpected exception %s' % e)
+        
+        TestRpcService.callback_method_condition.wait(2.0)
+        self.assertEquals(True, TestRpcService.callback_method_called,
+                          'Asynch callback was not called')
+        
+        self.assertEquals(self.request, TestRpcService.callback_method_request,
+                          'Asynch callback request arg not equal to request')
+        
+        # Cannot compare reposne to None because of bug in protobuf msg compare code
+        self.assert_(type(TestRpcService.callback_method_response) != None.__class__,
+                            'Callback response was None')
     
     def test_call_synch(self):
         '''Test a synchronous call'''
