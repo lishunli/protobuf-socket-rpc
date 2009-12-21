@@ -123,7 +123,7 @@ class TestRpcService(unittest.TestCase):
         self.request.str_data = 'I like cheese'
         self.callback = lambda request, response : response
         
-        #Start a server thread
+        # Start a server thread
         ServerThread.start_server()
         
     def tearDown(self):
@@ -161,7 +161,7 @@ class TestRpcService(unittest.TestCase):
         self.assertEquals(True, callback.called,
                           'Asynch callback was not called')
         
-        # Cannot compare reposne to None because of bug in protobuf msg compare code
+        # Cannot compare response to None because of bug in protobuf msg compare code
         self.assert_(type(callback.response) != None.__class__,
                             'Callback response was None')  
     
@@ -173,7 +173,7 @@ class TestRpcService(unittest.TestCase):
             self.service.TestMethod(self.request, callback=TestRpcService.callback)
         except Exception, e:
             traceback.print_exc()
-            self.assert_(False, 'Caught an unexpected exception %s' % e)
+            self.fail('Caught an unexpected exception %s' % e)
         
         TestRpcService.callback_method_condition.wait(2.0)
         self.assertEquals(True, TestRpcService.callback_method_called,
@@ -190,10 +190,11 @@ class TestRpcService(unittest.TestCase):
         '''Test a synchronous call'''
         
         try:
-            self.service.TestMethod(self.request, timeout=1000)
-
+            response = self.service.TestMethod(self.request, timeout=1000)
         except Exception, e:
-            self.assert_(False, 'Caught an unexpected exception %s' % e)
+            self.fail('Caught an unexpected exception %s' % e)
+        self.assertNotEqual(type(response) != None.__class__,
+                            'Callback response was None')
 
                 
             

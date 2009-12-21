@@ -65,9 +65,10 @@ class RpcThread(threading.Thread):
             # Create an instance of a new generic type initialized with a
             # dict that has a run method pointing to the callback function
             self.method(self.service, self.controller, self.request,
-                        type("", (), {"run": lambda *args : self.callback(self.request, args[1])})())
+                        type("", (), {"run": lambda *args : \
+                                      self.callback(self.request, args[1])})())
         else:
-            #Assuming callback has a run method
+            # Assuming callback has a run method
             self.method(self.service, self.controller, self.request,
                         self.callback)
         
@@ -156,7 +157,10 @@ class RpcService(object):
                  (callback.__class__.__dict__.get('run') == None or
                   callback.run.func_code.co_argcount < 2)) or
                    (callable(callback) and callback.func_code.co_argcount < 2)):
-                raise Exception("callback must be a callable with signature callback(request, response, ...) or an object with a callable run function with the same signature")                    
+                raise Exception("callback must be a callable with signature " +
+                                "callback(request, response, ...) or an " +
+                                "object with a callable run function with " +
+                                "the same signature")                    
             rpc_callback = callback
         
         # Create a controller for this call
@@ -164,7 +168,8 @@ class RpcService(object):
         
         # Spawn a new thread to wait for the callback so this can return
         # immediately if an asynch callback has been requested
-        rpc_thread = RpcThread(rpc, self.service, controller, request, rpc_callback)
+        rpc_thread = RpcThread(rpc, self.service, controller,
+                               request, rpc_callback)
         rpc_thread.start()
         # If a callback has been passed in return 
         if rpc_callback == callback:
