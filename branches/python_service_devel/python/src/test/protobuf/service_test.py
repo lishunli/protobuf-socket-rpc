@@ -132,7 +132,6 @@ class TestRpcService(unittest.TestCase):
                                           host)
         self.request = test_pb2.Request()
         self.request.str_data = 'I like cheese'
-        #self.callback = lambda request, response : response
         
         # Start a server thread
         ServerThread.start_server(success_port, fail_port, Exception('YOU FAIL!'))

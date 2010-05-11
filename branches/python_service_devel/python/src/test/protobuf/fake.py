@@ -66,7 +66,6 @@ class TestServiceImpl(test_pb2.TestService):
 
         # Simulate a user specified failure
         if self.failmsg:
-            #controller.success = False
             controller.handleError(-1, self.failmsg)
             
         # As per specification, call the run method of the done callback
