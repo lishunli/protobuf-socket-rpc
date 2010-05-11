@@ -183,7 +183,10 @@ class SocketHandler(SocketServer.StreamRequestHandler):
     def retrieveProtoRequest(self, service, method, request):
         ''' Retrieve the users protocol message from the RPC message'''
         proto_request = service.GetRequestClass(method)()
-        proto_request.ParseFromString(request.request_proto)
+        try:
+   	    proto_request.ParseFromString(request.request_proto)
+        except Exception, e:
+            raise error.BadRequestProtoError(e.message)
         
         # Check the request parsed correctly
         if not proto_request.IsInitialized():
