@@ -6,6 +6,10 @@
 
 == Trunk HEAD ==
 
+  * ...
+
+== Version 1.3.2 (SVN Revision 89) ==
+
   * Add metadata to python/setup.py
   * Rename Python module from protobuf to protobuf.socketrpc to avoid name clashes (Issue 17)
   * Join thread instead of busy waiting for synchronous calls (Python)
