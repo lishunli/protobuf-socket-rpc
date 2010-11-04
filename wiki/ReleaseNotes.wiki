@@ -6,6 +6,20 @@
 
 == Trunk HEAD ==
 
+  * Rename Python module from protobuf to protobuf.socketrpc to avoid name clashes (Issue 17)
+  * Join thread instead of busy waiting for synchronous calls (Python)
+  * Protobuf 2.3.0 compatible
+  * Reorganized tree to match Maven conventions
+  * Support more options to start the Server (Java)
+  * !SocketRpcChannel deprecated in favour of !RpcChannelImpl (Java)
+  * Fixes for Issue 11 (Cannot create different server side handlers for the same service) and Issue 12 (Exceptions on server not propogated to client)
+  * Fixed unit tests
+
+== Version 1.3.1 (SVN Revision 46) ==
+
+  * Allow customization of server socket with backlog and bind inet addr (Java)
+  * Added Service class to make rpc calls cleaner and hide some of the setup details (Python)
+
 == Version 1.3 (SVN Revision 33) ==
 
   * Protobuf 2.2.0 compatible and dependent.
