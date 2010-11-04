@@ -6,6 +6,7 @@
 
 == Trunk HEAD ==
 
+  * Add metadata to python/setup.py
   * Rename Python module from protobuf to protobuf.socketrpc to avoid name clashes (Issue 17)
   * Join thread instead of busy waiting for synchronous calls (Python)
   * Protobuf 2.3.0 compatible
