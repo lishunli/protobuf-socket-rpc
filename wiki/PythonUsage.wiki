@@ -1,5 +1,5 @@
+#summary A simple usage example for Python
 #labels Python,Example
-#describes a simple usage example for Python
 
 = Python Usage =
 
