@@ -13,22 +13,23 @@ ServerRpcConnectionFactory rpcConnectionFactory = SocketRpcConnectionFactories
     .createServerRpcConnectionFactory(port);
 RpcServer server = new RpcServer(rpcConnectionFactory, 
     Executors.newFixedThreadPool(threadPoolSize), true);
-server.registerBlockingService(
-    HelloWorldService.newReflectiveBlockingService(new MyServiceImpl()));
+server.registerService(new MyServiceImpl()); // For non-blocking impl
+server.registerBlockingService(MyService
+    .newReflectiveBlockingService(new MyBlockingInterfaceImpl())); // For blocking impl
 server.run();
 }}}
 
-== Blocking Client Side ==
+== Client Side (Blocking) ==
 
 {{{
 // Create channel
 RpcConnectionFactory connectionFactory = SocketRpcConnectionFactories
     .createRpcConnectionFactory(host, port);
 BlockingRpcChannel channel = RpcChannels.newBlockingRpcChannel(connectionFactory);
-RpcController controller = new SocketRpcController();
 
 // Call service
 BlockingInterface service = MyService.newBlockingStub(channel);
+RpcController controller = new SocketRpcController();
 MyResponse myResponse = service.myMethod(controller, myRequest);
 
 // Check success
@@ -38,17 +39,17 @@ if (rpcController.failed()) {
 }
 }}}
 
-== Client Side ==
+== Client Side (non-blocking) ==
 
 {{{
 // Create channel
 RpcConnectionFactory connectionFactory = SocketRpcConnectionFactories
     .createRpcConnectionFactory(host, port);
 RpcChannel channel = RpcChannels.newRpcChannel(connectionFactory);
-RpcController controller = new SocketRpcController();
 
 // Call service
 MyService myService = MyService.newStub(channel);
+RpcController controller = new SocketRpcController();
 myService.myMethod(rpcController, myRequest,
     new RpcCallback<MyResponse>() {
       public void run(MyResponse myResponse) {
