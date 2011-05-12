@@ -1,0 +1,40 @@
+#summary A simple usage example for Java
+
+= Java Usage =
+
+The following example shows a server and a client using the `com.googlecode.protobuf.socketrpc` Java API.
+
+== Server side ==
+
+{{{
+// Start server
+ServerRpcConnectionFactory rpcConnectionFactory = SocketRpcConnectionFactories.createServerRpcConnectionFactory(8090);
+RpcServer server = new RpcServer(rpcConnectionFactory, Executors.newFixedThreadPool(threadPoolSize), true);
+server.registerBlockingService(HelloWorldService.newReflectiveBlockingService(new MyServiceImpl()));
+server.run();
+}}}
+
+== Client Side ==
+
+{{{
+// Create channel
+RpcConnectionFactory connectionFactory = SocketRpcConnectionFactories.createRpcConnectionFactory(host, port);
+BlockingRpcChannel channel = RpcChannels.newBlockingRpcChannel(connectionFactory);
+BlockingInterface service = HelloWorld.HelloWorldService.newBlockingStub(channel);
+RpcController controller = new SocketRpcController();
+
+// Call service
+MyService myService = MyService.newStub(socketRpcChannel);
+myService.myMethod(rpcController, myRequest,
+    new RpcCallback<MyResponse>() {
+      public void run(MyResponse myResponse) {
+        System.out.println("Received Response: " + myResponse);
+      }
+    });
+    
+// Check success
+if (rpcController.failed()) {
+  System.err.println(String.format("Rpc failed %s : %s", rpcController.errorReason(),
+      rpcController.errorText()));
+}
+}}}
