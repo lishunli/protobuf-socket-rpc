@@ -8,7 +8,7 @@
 
   * ...
 
-== Version 2.0 (SVN Revision 89) ==
+== Version 2.0 (SVN Revision 94) ==
 
   * Add true async support to Java implementation.
   * Add persistent connection support to Java. Multiple rpcs over single connection.
