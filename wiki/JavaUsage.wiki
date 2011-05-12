@@ -10,12 +10,32 @@ The following example shows a server and a client using the `com.googlecode.prot
 {{{
 // Start server
 ServerRpcConnectionFactory rpcConnectionFactory = SocketRpcConnectionFactories
-    .createServerRpcConnectionFactory(8090);
+    .createServerRpcConnectionFactory(port);
 RpcServer server = new RpcServer(rpcConnectionFactory, 
     Executors.newFixedThreadPool(threadPoolSize), true);
 server.registerBlockingService(
     HelloWorldService.newReflectiveBlockingService(new MyServiceImpl()));
 server.run();
+}}}
+
+== Blocking Client Side ==
+
+{{{
+// Create channel
+RpcConnectionFactory connectionFactory = SocketRpcConnectionFactories
+    .createRpcConnectionFactory(host, port);
+BlockingRpcChannel channel = RpcChannels.newBlockingRpcChannel(connectionFactory);
+RpcController controller = new SocketRpcController();
+
+// Call service
+BlockingInterface service = MyService.newBlockingStub(channel);
+MyResponse myResponse = service.myMethod(controller, myRequest);
+
+// Check success
+if (rpcController.failed()) {
+  System.err.println(String.format("Rpc failed %s : %s", rpcController.errorReason(),
+      rpcController.errorText()));
+}
 }}}
 
 == Client Side ==
@@ -24,12 +44,11 @@ server.run();
 // Create channel
 RpcConnectionFactory connectionFactory = SocketRpcConnectionFactories
     .createRpcConnectionFactory(host, port);
-BlockingRpcChannel channel = RpcChannels.newBlockingRpcChannel(connectionFactory);
-BlockingInterface service = HelloWorld.HelloWorldService.newBlockingStub(channel);
+RpcChannel channel = RpcChannels.newRpcChannel(connectionFactory);
 RpcController controller = new SocketRpcController();
 
 // Call service
-MyService myService = MyService.newStub(socketRpcChannel);
+MyService myService = MyService.newStub(channel);
 myService.myMethod(rpcController, myRequest,
     new RpcCallback<MyResponse>() {
       public void run(MyResponse myResponse) {
