@@ -5,6 +5,8 @@
 
 The following example shows a server and a client using the `com.googlecode.protobuf.socketrpc` Java API.
 
+Note that this example uses delimited rpc channel factories which is new in version 2.0 and is not compatible with 1.x versions. Use undelimited rpc channel factories if you need to communicate with 1.x versions.
+
 == Server side ==
 
 {{{
