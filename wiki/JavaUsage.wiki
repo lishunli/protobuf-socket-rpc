@@ -1,4 +1,5 @@
 #summary A simple usage example for Java
+#labels Java,Example
 
 = Java Usage =
 
@@ -8,9 +9,12 @@ The following example shows a server and a client using the `com.googlecode.prot
 
 {{{
 // Start server
-ServerRpcConnectionFactory rpcConnectionFactory = SocketRpcConnectionFactories.createServerRpcConnectionFactory(8090);
-RpcServer server = new RpcServer(rpcConnectionFactory, Executors.newFixedThreadPool(threadPoolSize), true);
-server.registerBlockingService(HelloWorldService.newReflectiveBlockingService(new MyServiceImpl()));
+ServerRpcConnectionFactory rpcConnectionFactory = SocketRpcConnectionFactories
+    .createServerRpcConnectionFactory(8090);
+RpcServer server = new RpcServer(rpcConnectionFactory, 
+    Executors.newFixedThreadPool(threadPoolSize), true);
+server.registerBlockingService(
+    HelloWorldService.newReflectiveBlockingService(new MyServiceImpl()));
 server.run();
 }}}
 
@@ -18,7 +22,8 @@ server.run();
 
 {{{
 // Create channel
-RpcConnectionFactory connectionFactory = SocketRpcConnectionFactories.createRpcConnectionFactory(host, port);
+RpcConnectionFactory connectionFactory = SocketRpcConnectionFactories
+    .createRpcConnectionFactory(host, port);
 BlockingRpcChannel channel = RpcChannels.newBlockingRpcChannel(connectionFactory);
 BlockingInterface service = HelloWorld.HelloWorldService.newBlockingStub(channel);
 RpcController controller = new SocketRpcController();
