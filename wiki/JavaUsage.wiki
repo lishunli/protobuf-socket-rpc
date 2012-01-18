@@ -44,10 +44,13 @@ if (rpcController.failed()) {
 == Client Side (non-blocking) ==
 
 {{{
+// Create a thread pool
+ExecutorService threadPool = Executor.newFixedThreadPool(1);
+
 // Create channel
 RpcConnectionFactory connectionFactory = SocketRpcConnectionFactories
     .createRpcConnectionFactory(host, port);
-RpcChannel channel = RpcChannels.newRpcChannel(connectionFactory);
+RpcChannel channel = RpcChannels.newRpcChannel(connectionFactory, threadPool);
 
 // Call service
 MyService myService = MyService.newStub(channel);
